@@ -1,0 +1,65 @@
+% Section VI figure, averaging (two panels, single column), poor-gain start at c = C*.
+% (a) within-pair cost ratios per plant, KLPI-iso / PGAC-iso (circles) and
+%     KLPI / PGAC-shaped (squares); each pair differs only in the averaging (95% intervals).
+% (b) ratio of the median relative gap of KLPI-iso to that of PGAC-iso, P1-P4, averaged over
+%     short log windows (g1_ratio_poor_P*.dat).
+% Data: g1_poor.dat, g1_ratio_poor_P{1..4}.dat in \datadir.
+\documentclass[tikz,border={2pt 0pt 2pt 1pt}]{standalone}
+\input{preamble.tex}
+\def\datadir{../results/tables}
+\definecolor{cPone}{HTML}{00838F}
+\definecolor{cPtwo}{HTML}{000000}
+\definecolor{cPthree}{HTML}{C2185B}
+\definecolor{cPfour}{HTML}{8D5A00}
+% Pair colours of panel (a), distinct from the plant colours.
+\definecolor{cIso}{HTML}{1565C0}
+\definecolor{cSh}{HTML}{7B1FA2}
+\pgfplotsset{
+  every axis/.append style={font=\scriptsize, tick label style={font=\scriptsize},
+    label style={font=\scriptsize}, xlabel style={yshift=2pt}, ylabel style={yshift=-2pt},
+    title style={font=\scriptsize, yshift=-1mm, align=center}},
+  rpanel/.style={scale only axis, width=2.95cm, height=2.4cm},
+}
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[rpanel, name=a, xmin=0.5, xmax=4.5, xtick={1,2,3,4}, xticklabels={P1,P2,P3,P4},
+  ymin=0.9, ymax=1.1,
+  scaled y ticks=false, yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2},
+  ylabel={ratio $r$ within each pair},
+  legend style={at={(0.03,0.03)}, anchor=south west, font=\tiny, draw=none, fill=none,
+    inner sep=0pt, row sep=-2pt},
+  legend cell align=left,
+  title={(a) averaging raises the\\ cost by about 5\% on P1, P4}]
+\addplot[gray, densely dotted, domain=0.5:4.5, samples=2, forget plot] {1};
+\node[font=\scriptsize, gray, anchor=north west, inner sep=2pt] at (rel axis cs:0.01,0.99)
+  {averaging raises cost};
+\addplot[cIso, only marks, mark=*, mark size=0.9pt,
+  error bars/.cd, y dir=both, y explicit, error bar style={line width=0.7pt},
+  error mark options={rotate=90, mark size=1.4pt, line width=0.7pt}]
+  table[x expr=\thisrow{x}-0.16, y=iso, y error plus=ep, y error minus=em] {\datadir/g1_poor.dat};
+\addlegendentry{KLPI-iso / PGAC-iso}
+\addplot[cSh, only marks, mark=square*, mark size=0.85pt,
+  error bars/.cd, y dir=both, y explicit, error bar style={line width=0.7pt},
+  error mark options={rotate=90, mark size=1.4pt, line width=0.7pt}]
+  table[x expr=\thisrow{x}+0.16, y=klsh, y error plus=kp, y error minus=km] {\datadir/g1_poor.dat};
+\addlegendentry{KLPI / PGAC-shaped}
+\end{axis}
+\begin{axis}[xmode=log, rpanel, name=b, at={($(a.south east)+(10mm,0)$)}, anchor=south west,
+  xmin=0.8, xmax=2e5, ymin=0.8, ymax=2.0, xtick={1,100,10000}, xticklabels={$1$,$10^2$,$10^4$},
+  ytick={0.8,1,1.2,1.4,1.6,1.8,2},
+  xlabel={online sample $t-t_0+1$}, ylabel={ratio of median $\delta_t$},
+  title={(b) KLPI-iso improves its\\ gain more slowly early on}]
+\draw[gray, densely dotted] (axis cs:0.8,1) -- (axis cs:2e5,1);
+\addplot[cPtwo, line width=0.9pt] table[x=k, y=r] {\datadir/g1_ratio_poor_P2.dat};
+\addplot[cPthree, line width=0.9pt] table[x=k, y=r] {\datadir/g1_ratio_poor_P3.dat};
+\addplot[cPfour, line width=0.9pt] table[x=k, y=r] {\datadir/g1_ratio_poor_P4.dat};
+\addplot[cPone, line width=0.9pt] table[x=k, y=r] {\datadir/g1_ratio_poor_P1.dat};
+\end{axis}
+\node[anchor=north east, font=\scriptsize, align=left, inner sep=1pt]
+  at ($(b.north east)+(-0.5mm,-4.5mm)$) {%
+  \tikz[baseline=-0.6ex]\draw[cPone, line width=1pt] (0,0) -- (3mm,0);\ \textcolor{cPone}{P1}\\[-1pt]
+  \tikz[baseline=-0.6ex]\draw[cPtwo, line width=1pt] (0,0) -- (3mm,0);\ \textcolor{cPtwo}{P2}\\[-1pt]
+  \tikz[baseline=-0.6ex]\draw[cPthree, line width=1pt] (0,0) -- (3mm,0);\ \textcolor{cPthree}{P3}\\[-1pt]
+  \tikz[baseline=-0.6ex]\draw[cPfour, line width=1pt] (0,0) -- (3mm,0);\ \textcolor{cPfour}{P4}};
+\end{tikzpicture}
+\end{document}

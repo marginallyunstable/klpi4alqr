@@ -1,0 +1,89 @@
+% Section VI figure, probing shape from the standard start (three panels, full text width).
+% (a) ratio r = KLPI / PGAC-iso of the average cost over the run, against the probing budget
+%     relative to the optimal cost, f = c / C*, four plants (95% intervals as bands).
+% (b) the same ratio at c = C*/2 for the 40 random plants, against the input spread; marker shows whether the 95% interval lies below one, contains one, or lies above.
+% (c) the ratio per log-spaced window of online samples k at c = C*, four plants (95% bands).
+% Data: g1_wide_P{1..4}.dat, g1_random.dat, g1_time_P{1..4}_f1.dat in \datadir.
+\documentclass[tikz,border={3pt 0pt 3pt 1pt}]{standalone}
+\input{preamble.tex}
+\def\datadir{../results/tables}
+\definecolor{cPone}{HTML}{00838F}
+\definecolor{cPtwo}{HTML}{000000}
+\definecolor{cPthree}{HTML}{C2185B}
+\definecolor{cPfour}{HTML}{8D5A00}
+\definecolor{cBelow}{HTML}{000000}
+\definecolor{cNone}{HTML}{8A8A8A}
+\definecolor{cAbove}{HTML}{7B1FA2}
+\pgfplotsset{
+  every axis/.append style={font=\footnotesize, tick label style={font=\scriptsize},
+    label style={font=\footnotesize}, xlabel style={yshift=2pt},
+    title style={font=\scriptsize, yshift=-1mm, align=center}},
+  band/.style={fill=#1, fill opacity=0.18, draw=none},
+  rpanel/.style={scale only axis, width=4.5cm, height=2.75cm},
+  unbounded coords=discard,
+}
+% #1 file stem, #2 x column, #3 colour, #4 marker, #5 path-name prefix, #6 end label, #7 label anchor
+\newcommand{\bandcurve}[7]{%
+  \addplot[name path=lo#5, draw=none, forget plot] table[x=#2, y=lo] {\datadir/#1.dat};
+  \addplot[name path=hi#5, draw=none, forget plot] table[x=#2, y=hi] {\datadir/#1.dat};
+  \addplot[band=#3, forget plot] fill between[of=lo#5 and hi#5];
+  \addplot[#3, line width=1.0pt, mark=#4, mark size=1.5pt, mark options={solid, fill=white},
+    forget plot] table[x=#2, y=r] {\datadir/#1.dat}
+    node[pos=1, anchor=#7, font=\scriptsize, text=#3, inner sep=2pt] {#6};
+}
+% #1 test, #2 colour, #3 marker options
+\newcommand{\rndclass}[3]{%
+  \addplot[only marks, #3, error bars/.cd, y dir=both, y explicit,
+    error bar style={line width=0.6pt, #2}, error mark options={rotate=90, mark size=1.2pt, line width=0.6pt, #2}]
+    table[x expr={(#1) ? \thisrow{spread} : nan}, y=r,
+      y error plus expr=\thisrow{hi}-\thisrow{r}, y error minus expr=\thisrow{r}-\thisrow{lo}]
+    {\datadir/g1_random.dat};
+}
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[xmode=log, ymode=log, rpanel, name=a, xmin=0.011, xmax=5, ymin=0.3, ymax=1.8,
+  xtick={0.015625,0.0625,0.25,0.5,1,2},
+  xticklabels={$\tfrac{1}{64}$,$\tfrac{1}{16}$,$\tfrac{1}{4}$,$\tfrac{1}{2}$,$1$,$2$},
+  ytick={0.3,0.5,0.7,1,1.4}, yticklabels={$0.3$,$0.5$,$0.7$,$1$,$1.4$},
+  xlabel={probing budget $c/C^\star$}, ylabel={ratio $r$},
+  title={(a) KLPI's probing shape lowers\\ the cost, most on P2 and P4}]
+\draw[gray, densely dotted] (axis cs:0.011,1) -- (axis cs:5,1);
+\bandcurve{g1_wide_P2}{f}{cPtwo}{none}{Pa2}{P2}{north west}
+\bandcurve{g1_wide_P4}{f}{cPfour}{none}{Pa4}{P4}{north west}
+\bandcurve{g1_wide_P3}{f}{cPthree}{none}{Pa3}{P3}{south west}
+\bandcurve{g1_wide_P1}{f}{cPone}{none}{Pa1}{P1}{north west}
+\node[font=\scriptsize, gray, anchor=north west, inner sep=2pt] at (rel axis cs:0.01,0.99) {PGAC-iso lower cost};
+\node[font=\scriptsize, gray, anchor=south west, inner sep=2pt] at (rel axis cs:0.01,0.01) {KLPI lower cost};
+\end{axis}
+\begin{axis}[xmode=log, ymode=log, rpanel, name=b, at={($(a.south east)+(12mm,0)$)}, anchor=south west,
+  xmin=0.8, xmax=100, ymin=0.18, ymax=2.1, xtick={1,10,100},
+  ytick={0.2,0.3,0.5,0.7,1,1.4}, yticklabels={$0.2$,$0.3$,$0.5$,$0.7$,$1$,$1.4$},
+  xlabel={input spread $\varrho$}, ylabel={ratio $r$},
+  title={(b) 40 random plants, $c=C^\star/2$: the\\ reduction tends to grow with the input spread}]
+\draw[gray, densely dotted] (axis cs:0.8,1) -- (axis cs:100,1);
+\rndclass{\thisrow{hi}<1}{cBelow}{mark=*, mark size=0.9pt, cBelow}
+\rndclass{\thisrow{lo}<=1 && \thisrow{hi}>=1}{cNone}{mark=o, mark size=0.9pt, cNone}
+\rndclass{\thisrow{lo}>1}{cAbove}{mark=square*, mark size=0.9pt, cAbove}
+\node[font=\scriptsize, gray, anchor=north east, inner sep=2pt] at (rel axis cs:0.99,0.99) {PGAC-iso lower cost};
+\node[font=\scriptsize, gray, anchor=south west, inner sep=2pt] at (rel axis cs:0.01,0.01) {KLPI lower cost};
+\end{axis}
+\node[anchor=south west, font=\scriptsize, align=left, inner sep=1pt]
+  at ($(b.south west)+(0.5mm,4mm)$) {%
+  \tikz[baseline=-0.6ex]\fill[cBelow] (0,0) circle (0.9pt);\ below $1$\\[-1pt]
+  \tikz[baseline=-0.6ex]\draw[cNone] (0,0) circle (0.9pt);\ contains $1$\\[-1pt]
+  \tikz[baseline=-0.6ex]\fill[cAbove] (-0.9pt,-0.9pt) rectangle (0.9pt,0.9pt);\ above $1$};
+\begin{axis}[xmode=log, ymode=log, rpanel, name=c, at={($(b.south east)+(12mm,0)$)}, anchor=south west,
+  xmin=0.8, xmax=6e5, ymin=0.18, ymax=2.2, xtick={1,100,10000,1000000}, xticklabels={$1$,$10^2$,$10^4$,},
+  ytick={0.2,0.3,0.5,0.7,1,1.4,2}, yticklabels={$0.2$,$0.3$,$0.5$,$0.7$,$1$,$1.4$,$2$},
+  xlabel={online sample $t-t_0+1$}, ylabel={windowed ratio $r$},
+  title={(c) at $c=C^\star$: on P2 and P4 the reduction\\ grows, after an early loss on P4}]
+\draw[gray, densely dotted] (axis cs:0.8,1) -- (axis cs:6e5,1);
+\bandcurve{g1_time_P2_f1}{k}{cPtwo}{none}{Tc2}{P2}{west}
+\bandcurve{g1_time_P4_f1}{k}{cPfour}{none}{Tc4}{P4}{west}
+\bandcurve{g1_time_P3_f1}{k}{cPthree}{none}{Tc3}{P3}{south west}
+\bandcurve{g1_time_P1_f1}{k}{cPone}{none}{Tc1}{P1}{north west}
+\node[font=\scriptsize, gray, anchor=north east, inner sep=2pt] at (rel axis cs:0.99,0.99) {PGAC-iso lower cost};
+\node[font=\scriptsize, gray, anchor=south west, inner sep=2pt] at (rel axis cs:0.01,0.01) {KLPI lower cost};
+\end{axis}
+\end{tikzpicture}
+\end{document}

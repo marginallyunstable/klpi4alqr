@@ -1,0 +1,21 @@
+% Shared preamble for the figures of the paper (ecc27_minimal).
+\usepackage{amsmath,amssymb}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{calc}
+\usepgfplotslibrary{groupplots,fillbetween}
+% Role colours of the repository (reserved for variable roles; not used for curve identity).
+\definecolor{argblue}{HTML}{1F6FEB}
+\definecolor{obsgreen}{HTML}{2E7D32}
+\definecolor{margorange}{HTML}{E36209}
+% Method colours.
+\definecolor{muted}{HTML}{6B7280}
+\definecolor{cKL}{HTML}{000000}
+\definecolor{cGN}{HTML}{00838F}
+\definecolor{cNoise}{HTML}{9CA3AF}
+\pgfplotsset{
+  every axis/.append style={font=\scriptsize, tick label style={font=\tiny},
+    label style={font=\scriptsize}, title style={font=\scriptsize, yshift=-1mm},
+    legend style={font=\tiny, draw=none, fill=none}},
+  band/.style={fill=#1, fill opacity=0.15, draw=none},
+}

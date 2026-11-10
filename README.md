@@ -4,6 +4,8 @@ This repository holds the simulations of Section VI of
 
 > [1] A. Bhole, M. Mahmoudi Filabadi, G. Crevecoeur, T. Lefebvre, "KL-Regularized Policy Iteration for Adaptive LQR: Gain Updates and Probing from One Policy Improvement", 2026.
 
+The extended version of [1], with all proofs, is [klpi4alqr_extended.pdf](klpi4alqr_extended.pdf); the arXiv link will follow.
+
 ```
 paper.ipynb    the setup, one run of the four variants as a plain loop, the driver of all runs,
                and Figs. 1 and 2 of [1]
